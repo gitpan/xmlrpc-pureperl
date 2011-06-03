@@ -6,7 +6,7 @@ use Exporter;
 use LWP::UserAgent;
 use HTTP::Request;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 =head1 XMLRPC::PurePerl
 
@@ -623,8 +623,9 @@ Yeah, there's a bunch of these modules out there for this kind of stuff.  I in n
 =head1 Acknowledgements:
 
 Dave Winer, thanks for such a great protocol
-Paul Lindner and Randy Ray (thanks for the kudos in your book "Programming Web Services in Perl"!), my former co-workers at Red Hat
+Paul Lindner and Randy Ray (thanks for the kudos in your book "Programming Web Services in Perl"!), my former co-workers at Red Hat.
 Joshua Blackburn, who pushed me to write the original javascript implementation of this module.
+Claus Brunzema, for a very polite bug report dealing with negative integers!
 
 =head1 COPYRIGHT:
 
