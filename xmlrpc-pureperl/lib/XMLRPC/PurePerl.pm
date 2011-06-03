@@ -6,7 +6,7 @@ use Exporter;
 use LWP::UserAgent;
 use HTTP::Request;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 =head1 XMLRPC::PurePerl
 
@@ -216,7 +216,7 @@ sub encode_variable {
   if ( ! $ref ) {
     if ( $obj =~ /^\-?[0-9]+\.[0-9]*$/ ) {
       ${$xml} .= "<value><double>$obj</double></value>\n";
-    } elsif ( $obj =~ /^[0-9]+$/ ) {
+    } elsif ( $obj =~ /^-?[0-9]+$/ ) {
       ${$xml} .= "<value><i4>$obj</i4></value>\n";
     } else {
       ${$xml} .= "<value><string>" . &_entity_encode($obj) . "</string></value>\n";
