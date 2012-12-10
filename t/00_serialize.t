@@ -8,7 +8,6 @@ use Test;
 
 BEGIN { plan tests => 24 }
 
-print "Testing date functions\n";
 foreach my $dt ( "20060302", "20040303", "2003-10-10T10:13:14.000Z", "2004-04-22T00:00", "SEP 17, 2003 09:45", "04/22/2004 00:00", "2004/04/22 00:00:01 AM", "04/22/2004", "302100ZSEP04", "6 June 2006", "30 July 2005", "30 July 2005 11:12:13 PM", "July 30 2005 11:12PM", "20001109171203", "{ts '2003-06-23 12:21:43'}", "19980717T14:08:55" ) {
   my $val = XMLRPC::PurePerl->date($dt)->value();
   if ( $val =~ /^[0-9]{8}T[0-9]{2}:[0-9]{2}:[0-9]{2}$/ ) {
@@ -19,7 +18,6 @@ foreach my $dt ( "20060302", "20040303", "2003-10-10T10:13:14.000Z", "2004-04-22
   }
 }
 
-print "Testing encode functions\n"; 
 my $tests = {
   'string'  => { 'in' => 'foo', 'out' => '<value><string>foo</string></value>' },
   'array'   => { 'in' => [], 'out' => "<value><array><data></data></array></value>" },

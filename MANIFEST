@@ -1,4 +1,4 @@
-ChangeLog              # empty as this the 0.01 release
+ChangeLog              # All changes up to this point
 MANIFEST               # This file
 Makefile.PL            # MakeMaker file
 bench/xmlrpc_bench     # A simple benchmark script

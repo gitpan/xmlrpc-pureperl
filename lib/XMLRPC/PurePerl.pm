@@ -6,7 +6,7 @@ use Exporter;
 use LWP::UserAgent;
 use HTTP::Request;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 =head1 XMLRPC::PurePerl
 
@@ -330,7 +330,7 @@ sub decode_xmlrpc {
   if ( $xml =~ /<fault>/ ) {
     shift(@tokens) until ( $tokens[0] eq 'value' ); # whittle!
     pop(@tokens)   until ( $tokens[$#tokens] eq '/value' );
-    return new XMLRPC::PurePerl::Fault( &decode_variable( \@tokens ) );
+    return XMLRPC::PurePerl::Fault->new( &decode_variable( \@tokens ) );
   }
 
   my $methodName;
@@ -525,19 +525,28 @@ sub new {
   # format more than anything...
   # 19980717T14:08:55 is an example of the format we're after...
 
-  if ( $date =~ $ymd ) { # 20050701 , 20050701 00:00:00 , 20050701 00:00:00PM , 2004/04/22 , 2004/22/02 00:00 
-    $this->{'val'} = ( length($1) == 2 ? '20' . $1 : $1 )  . $2 . sprintf("%02d", $3) . 'T' .  ( $4 ? ( $6 eq 'PM' ? 12 + $4 : $4 ) . ( length($5) == 3 ? $5 . ':00' : $5 ) : '00:00:00' );
+  if ( my ( $year, $month, $day, $hour, $minsec, $ampm ) = $date =~ $ymd ) { # 20050701 , 20050701 00:00:00 , 20050701 00:00:00PM , 2004/04/22 , 2004/22/02 00:00 
+    $hour   ||= '00';
+    $minsec ||= ':00:00';
+    $ampm   ||= '';
+    $this->{'val'} = ( length($year) == 2 ? '20' . $year : $year )  . $month . sprintf("%02d", $day) . 'T' .  ( $hour ? ( $ampm eq 'PM' ? 12 + $hour : $hour ) . ( length($minsec) == 3 ? $minsec . ':00' : $minsec ) : '00:00:00' );
 
   } elsif ( $date =~ $prs ) { # 2001-01-01T05:22:23.000Z
     $this->{'val'} = $date;
     $this->{'val'} =~ s/\-//g;
     $this->{'val'} =~ s/\..*$//;
 
-  } elsif ( $date =~ $Mdy ) { # SEP 19, 2003 09:45:00
-    $this->{'val'} = $3 . $month_struct{uc($1)} . sprintf("%02d", $2) . 'T' . ( $4 ? ( $6 eq 'PM' ? 12 + $4 : $4 ) . ( length($5) == 3 ? $5 . ':00' : $5 ) : '00:00:00' );
+  } elsif ( my ($Mdy_month, $Mdy_day, $Mdy_year, $Mdy_hour, $Mdy_minsec, $Mdy_ampm) = $date =~ $Mdy ) { # SEP 19, 2003 09:45:00
+    $Mdy_hour   ||= '';
+    $Mdy_minsec ||= '';
+    $Mdy_ampm   ||= '';
+    $this->{'val'} = $Mdy_year . $month_struct{uc($Mdy_month)} . sprintf("%02d", $Mdy_day) . 'T' . ( $Mdy_hour ? ( $Mdy_ampm eq 'PM' ? 12 + $Mdy_hour : $Mdy_hour ) . ( length($Mdy_minsec) == 3 ? $Mdy_minsec . ':00' : $Mdy_minsec ) : '00:00:00' );
 
-  } elsif ( $date =~ $mdy ) { # 04-22-2004 , 04-22-2004 00:00AM, 04-22-2004 , 04-22-2004 00:00:00AM
-    $this->{'val'} = $3 . $2 . sprintf("%02d", $1) . 'T' .  ( $4 ? ( $6 eq 'PM' ? 12 + $4 : $4 ) . ( length($5) == 3 ? $5 . ':00' : $5 ) : '00:00:00' );
+  } elsif ( my ($mdy_month, $mdy_day, $mdy_year, $mdy_hour, $mdy_minsec, $mdy_ampm) = $date =~ $mdy ) { # 04-22-2004 , 04-22-2004 00:00AM, 04-22-2004 , 04-22-2004 00:00:00AM
+    $mdy_hour   ||= '';
+    $mdy_minsec ||= '';
+    $mdy_ampm   ||= '';
+    $this->{'val'} = $mdy_year . $mdy_day . sprintf("%02d", $mdy_month) . 'T' .  ( $mdy_hour ? ( $mdy_ampm eq 'PM' ? 12 + $mdy_hour : $mdy_hour ) . ( length($mdy_minsec) == 3 ? $mdy_minsec . ':00' : $mdy_minsec ) : '00:00:00' );
 
   } elsif ( $date =~ $dtg ) { # 2001-01-01T05:22:23.000Z
     $this->{'val'} = ( length($5) == 2 ? '20' . $5 : $5 ) .  $month_struct{uc($4)} . $1 . 'T' . "$2:$3:00";
@@ -626,6 +635,7 @@ Dave Winer, thanks for such a great protocol
 Paul Lindner and Randy Ray (thanks for the kudos in your book "Programming Web Services in Perl"!), my former co-workers at Red Hat.
 Joshua Blackburn, who pushed me to write the original javascript implementation of this module.
 Claus Brunzema, for a very polite bug report dealing with negative integers!
+Frank Rothhaupt, for a very polite bug report dealing with fault's!
 
 =head1 COPYRIGHT:
 
